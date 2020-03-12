@@ -33,9 +33,11 @@ var rootCmd = &cobra.Command{
 	Short: "A command line tool for clipboard based password management",
 
 	Long: `Consider the scenario when you need to quickly access passwords and not store in a file. 
-           Imagine you are in screen sharing session, and have to access a password stored in a file and you don't want the password  to be seen by others.
+Imagine you are in screen sharing session, and have to access a password stored in a file and you 
+don't want the password  to be seen by others.
 
-           This cli helps in saving passwords and when fetched writes the password to clipboard. You may then use Command-v to paste it.`,
+This cli helps in saving passwords and when fetched writes the password to clipboard.
+You may then use Command-v/Ctrl-v to paste it.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },

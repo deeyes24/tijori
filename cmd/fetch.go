@@ -16,9 +16,14 @@ limitations under the License.
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
 
+	"github.com/atotto/clipboard"
 	"github.com/spf13/cobra"
+	"github.com/tijori/tijori"
 )
 
 // fetchCmd represents the fetch command
@@ -28,8 +33,43 @@ var fetchCmd = &cobra.Command{
 	Long: `Use this to input the choice to fetch the password. The selected password is written to clipboard and can be Pasted 
 	into destination of your choice.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("fetch called")
+		reader := bufio.NewReader(os.Stdin)
+
+		savedPasswords := tijori.LoadSavedPasswords()
+		if len(savedPasswords) == 0 {
+			fmt.Println("No saved passwords")
+			return
+		} else {
+			for k, v := range savedPasswords {
+				fmt.Printf("%d. UserName : %s \n", k+1, v.UserName)
+				if len(v.AdditionalInfo) != 0 {
+					fmt.Printf("Additional Info: %s \n", v.AdditionalInfo)
+
+				}
+			}
+		}
+		strNum, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("caught error ", err.Error())
+			return
+		}
+		numInput, _ := strconv.Atoi(strNum)
+
+		password := tijori.FetchSavedPasswordFor(numInput + 1)
+		err = writeToClipBoard(password.Password)
+		if err != nil {
+			fmt.Println("caught error ", err.Error())
+			return
+		} else {
+			fmt.Println("Password is copied to clipboard")
+		}
 	},
+}
+
+func writeToClipBoard(password string) error {
+
+	return clipboard.WriteAll(password)
+
 }
 
 func init() {

@@ -15,8 +15,23 @@ limitations under the License.
 */
 package main
 
-import "github.com/tijori/cmd"
+import (
+	"path/filepath"
+
+	"github.com/tijori/cmd"
+	"github.com/tijori/tijori"
+
+	homedir "github.com/mitchellh/go-homedir"
+)
 
 func main() {
+	home, _ := homedir.Dir()
+	must(tijori.Init(filepath.Join(home, ".tijori.db")))
 	cmd.Execute()
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

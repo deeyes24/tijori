@@ -16,25 +16,65 @@ limitations under the License.
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tijori/config"
+	"github.com/tijori/tijori"
 )
 
 // saveCmd represents the save command
 var saveCmd = &cobra.Command{
 	Use:   "save",
 	Short: "Saves the UserName and Password combination to a file. The File is encoded and not human readable.",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
 
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("save called")
+		//tijorifmt.Println("save called")
+		var passwordInfo config.SavedPassword
+		//passwordInfo.UserName
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Printf("username (Required)")
+
+		username, err := reader.ReadString('\n')
+		username = strings.TrimSuffix(username, "\n")
+		if err != nil {
+			fmt.Println("caught error ", err.Error())
+		}
+		if isEmpty(username) {
+			fmt.Println("username cannot be empty")
+			os.Exit(1)
+		}
+		fmt.Printf("\npassword (Required) ")
+		password, _ := reader.ReadString('\n')
+		password = strings.TrimSuffix(password, "\n")
+		if isEmpty(password) {
+			fmt.Println("password cannot be empty")
+			os.Exit(1)
+		}
+
+		fmt.Printf("\nadditional info (Optional)")
+
+		additionalInfo, _ := reader.ReadString('\n')
+
+		passwordInfo.AdditionalInfo = additionalInfo
+		passwordInfo.Password = password
+		passwordInfo.UserName = username
+
+		tijori.AddtoSavedPasswords(passwordInfo)
+		fmt.Println("Saved!")
+
 	},
+}
+
+func isEmpty(s string) bool {
+	if len(s) == 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func init() {
